@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>sample_spec 목록</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --text: #15181d;
+    --text-2: #5b6370;
+    --line: #e1e4e9;
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.05);
+    --c: #a8741a; --soft: #f7eedc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111418;
+      --surface: #1a1e24;
+      --text: #e9ecf1;
+      --text-2: #9aa3b0;
+      --line: #2c323b;
+      --shadow: 0 1px 2px rgba(0,0,0,.3);
+      --c: #e6b45c; --soft: #3a2e17;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Malgun Gothic", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  .page {
+    max-width: 1000px; margin: 0 auto;
+    padding: 48px max(32px, env(safe-area-inset-right)) max(56px, env(safe-area-inset-bottom)) max(32px, env(safe-area-inset-left));
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin: 0 0 16px; font-size: 14px; font-weight: 600;
+    color: var(--text-2); text-decoration: none;
+  }
+  @media (hover: hover) { .back:hover { color: var(--c); } }
+  h1 { font-size: 30px; line-height: 1.3; margin: 0 0 6px; letter-spacing: -.01em; }
+  .lead { margin: 0 0 28px; color: var(--text-2); font-size: 15px; }
+  .section { margin: 32px 0 12px; font-size: 15px; font-weight: 700; color: var(--text-2); letter-spacing: .02em; }
+  .section:first-of-type { margin-top: 0; }
+
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .item {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--c);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    transition: border-color .15s, transform .15s;
+  }
+  @media (hover: hover) {
+    .item:hover { transform: translateY(-1px); border-color: var(--c); }
+  }
+  .main {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px;
+    color: inherit; text-decoration: none;
+  }
+  .main:focus-visible { outline: 2px solid var(--c); outline-offset: -4px; border-radius: 10px; }
+  .text { min-width: 0; flex: 1 1 auto; }
+  .title { display: block; font-size: 17px; font-weight: 700; line-height: 1.4; }
+  .desc { display: block; margin: 2px 0 0; font-size: 14px; color: var(--text-2); }
+  .file { display: block; margin: 4px 0 0; font-family: Consolas, "SF Mono", Menlo, ui-monospace, monospace; font-size: 12.5px; color: var(--text-2); }
+  .arrow { flex: 0 0 auto; color: var(--c); }
+
+  footer { margin-top: 28px; font-size: 13px; color: var(--text-2); }
+
+  /* 모바일 */
+  @media (max-width: 720px) {
+    .page { padding: 20px max(16px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+    .back { min-height: 40px; margin-bottom: 8px; }
+    h1 { font-size: 24px; }
+    .lead { font-size: 14px; margin-bottom: 20px; }
+    .main { padding: 14px 16px; gap: 12px; }
+    .title { font-size: 16px; }
+    .desc { font-size: 13.5px; }
+    .file { font-size: 12px; }
+  }
+  @media (max-width: 400px) { .arrow { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .item { transition: none; } }
+</style>
+</head>
+<body>
+<main class="page">
+  <a class="back" href="../index.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>상위 목록
+  </a>
+  <h1>sample_spec</h1>
+  <p class="lead">spec 폴더를 정본으로 두고 모든 src를 spec에서 만드는 방식을 다른 프로젝트에 심는 샘플이에요. 항목을 누르면 이 화면에서 해당 문서가 열립니다.</p>
+
+  <h2 class="section">설치 · 규칙</h2>
+  <ul class="list">
+    <li class="item"><a class="main" href="SETUP.md"><span class="text">
+      <span class="title">sample_spec 설치</span>
+      <span class="desc">대상 프로젝트 루트에 복사한 뒤 Claude Code로 설치하는 순서</span>
+      <span class="file">SETUP.md</span>
+    </span><svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></a></li>
+    <li class="item"><a class="main" href="CLAUDE_rules.md"><span class="text">
+      <span class="title">CLAUDE.md 에 덧붙일 규칙</span>
+      <span class="desc">설치 때 루트 CLAUDE.md에 추가하는 "spec이 정본" 규칙</span>
+      <span class="file">CLAUDE_rules.md</span>
+    </span><svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></a></li>
+  </ul>
+
+  <h2 class="section">명령어 (commands)</h2>
+  <ul class="list">
+    <li class="item"><a class="main" href="commands/src-init.md"><span class="text">
+      <span class="title">/src-init</span>
+      <span class="desc">spec만 보고 src를 처음부터 구현하는 슬래시 명령</span>
+      <span class="file">commands/src-init.md</span>
+    </span><svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></a></li>
+    <li class="item"><a class="main" href="commands/src-update.md"><span class="text">
+      <span class="title">/src-update</span>
+      <span class="desc">spec이 바뀐 뒤 바뀐 곳만 src에 반영하는 슬래시 명령</span>
+      <span class="file">commands/src-update.md</span>
+    </span><svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></a></li>
+  </ul>
+
+  <h2 class="section">spec 템플릿 (spec_template)</h2>
+  <ul class="list">
+    <li class="item"><a class="main" href="spec_template/README.md"><span class="text">
+      <span class="title">스펙 문서 README</span>
+      <span class="desc">프로젝트 구조 정의서 — 정본 규칙, 구성, 기술·실행, 고유 지시</span>
+      <span class="file">spec_template/README.md</span>
+    </span><svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></a></li>
+    <li class="item"><a class="main" href="spec_template/00_시작/01_개요.md"><span class="text">
+      <span class="title">01 · 개요</span>
+      <span class="desc">프로젝트의 목적, 사용자와 권한을 적는 틀</span>
+      <span class="file">spec_template/00_시작/01_개요.md</span>
+    </span><svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></a></li>
+    <li class="item"><a class="main" href="spec_template/00_시작/02_정책.md"><span class="text">
+      <span class="title">02 · 정책</span>
+      <span class="desc">프로젝트가 지켜야 할 규칙을 주제별로 근거와 함께 모으는 틀</span>
+      <span class="file">spec_template/00_시작/02_정책.md</span>
+    </span><svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></a></li>
+    <li class="item"><a class="main" href="spec_template/00_시작/03_정책_결정기록.md"><span class="text">
+      <span class="title">03 · 정책 결정 기록</span>
+      <span class="desc">결정을 기다리는 규칙(확인 대기)과 결정된 규칙의 근거</span>
+      <span class="file">spec_template/00_시작/03_정책_결정기록.md</span>
+    </span><svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></a></li>
+    <li class="item"><a class="main" href="spec_template/00_시작/04_구현_지시문.md"><span class="text">
+      <span class="title">04 · 구현 지시문 (처음)</span>
+      <span class="desc">spec만 보고 src를 처음 구현할 때 쓰는 범용 지시문</span>
+      <span class="file">spec_template/00_시작/04_구현_지시문.md</span>
+    </span><svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></a></li>
+    <li class="item"><a class="main" href="spec_template/00_시작/05_구현_지시문_변경시.md"><span class="text">
+      <span class="title">05 · 구현 지시문 (변경시)</span>
+      <span class="desc">spec을 고친 뒤 git으로 바뀐 곳을 찾아 src에 반영하는 범용 지시문</span>
+      <span class="file">spec_template/00_시작/05_구현_지시문_변경시.md</span>
+    </span><svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></a></li>
+  </ul>
+
+  <footer>문서 10개 · 상단 "상위 목록"을 누르면 전체 목록으로 돌아갑니다.</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>개발 방법론 정리</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --text: #15181d;
+    --text-2: #5b6370;
+    --line: #e1e4e9;
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.05);
+    --c1: #c15f3c; --c1-soft: #f7e9e3;
+    --c2: #1f7a4d; --c2-soft: #e3f3ea;
+    --c3: #2463b8; --c3-soft: #e4eefb;
+    --c4: #7a4fc1; --c4-soft: #efe8fa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111418;
+      --surface: #1a1e24;
+      --text: #e9ecf1;
+      --text-2: #9aa3b0;
+      --line: #2c323b;
+      --shadow: 0 1px 2px rgba(0,0,0,.3);
+      --c1: #e0896a; --c1-soft: #3a2820;
+      --c2: #5fcf95; --c2-soft: #16301f;
+      --c3: #7aaef0; --c3-soft: #1a2a40;
+      --c4: #b996f0; --c4-soft: #2a2140;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Malgun Gothic", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  .page {
+    max-width: 1200px; margin: 0 auto;
+    padding: 48px max(32px, env(safe-area-inset-right)) max(56px, env(safe-area-inset-bottom)) max(32px, env(safe-area-inset-left));
+  }
+  h1 { font-size: 30px; line-height: 1.3; margin: 0 0 32px; letter-spacing: -.01em; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    list-style: none; margin: 0; padding: 0;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--c);
+    border-radius: 16px;
+    padding: 26px 30px 28px;
+    box-shadow: var(--shadow);
+  }
+  .card:nth-child(1) { --c: var(--c1); --soft: var(--c1-soft); }
+  .card:nth-child(2) { --c: var(--c2); --soft: var(--c2-soft); }
+  .card:nth-child(3) { --c: var(--c3); --soft: var(--c3-soft); }
+  .card:nth-child(4) { --c: var(--c4); --soft: var(--c4-soft); }
+
+  .head { display: flex; align-items: center; gap: 16px; }
+  .abbr {
+    flex: 0 0 auto;
+    font-family: Consolas, "SF Mono", Menlo, ui-monospace, monospace;
+    font-size: 22px; font-weight: 700; letter-spacing: .02em;
+    color: var(--c); background: var(--soft);
+    padding: 8px 14px; border-radius: 10px; line-height: 1;
+  }
+  .names { min-width: 0; }
+  .en { margin: 0; font-size: 15px; font-weight: 600; color: var(--text-2); line-height: 1.4; }
+  .ko { margin: 2px 0 0; font-size: 20px; font-weight: 700; line-height: 1.4; }
+
+  .desc {
+    position: relative;
+    margin: 20px 0 0 18px;
+    padding: 2px 0 0 26px;
+  }
+  .desc::before {
+    content: "";
+    position: absolute; left: 0; top: -6px;
+    width: 16px; height: 20px;
+    border-left: 2px solid var(--line);
+    border-bottom: 2px solid var(--line);
+    border-bottom-left-radius: 6px;
+  }
+  .desc p { margin: 0; font-size: 16px; }
+
+  /* 태블릿 */
+  @media (max-width: 1024px) {
+    .page { padding-top: 36px; padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
+    .card { padding: 22px 22px 24px; }
+  }
+  /* 모바일 */
+  @media (max-width: 860px) {
+    .page { padding: 28px max(16px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+    h1 { font-size: 24px; margin-bottom: 20px; }
+    .grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    .card { padding: 20px 18px 22px; }
+    .head { gap: 12px; }
+    .abbr { font-size: 19px; padding: 7px 12px; }
+    .en { font-size: 14px; }
+    .ko { font-size: 18px; }
+    .desc { margin: 16px 0 0 12px; padding-left: 22px; }
+    .desc p { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>개발 방법론 정리</h1>
+
+  <ul class="grid">
+    <li class="card">
+      <div class="head">
+        <span class="abbr">SDD</span>
+        <div class="names">
+          <p class="en">Spec-Driven Development</p>
+          <p class="ko">명세 기반 개발</p>
+        </div>
+      </div>
+      <div class="desc">
+        <p>개발 명세서(Spec)를 먼저 작성하고, AI가 그 명세를 기준으로 코드를 생성하게 만드는 개발 방식</p>
+      </div>
+    </li>
+
+    <li class="card">
+      <div class="head">
+        <span class="abbr">TDD</span>
+        <div class="names">
+          <p class="en">Test-Driven Development</p>
+          <p class="ko">테스트 주도 개발</p>
+        </div>
+      </div>
+      <div class="desc">
+        <p>코드를 작성하기 전에 실패하는 테스트 코드를 먼저 작성하고, 이를 통과하는 최소한의 코드를 구현하는 방식</p>
+      </div>
+    </li>
+
+    <li class="card">
+      <div class="head">
+        <span class="abbr">BDD</span>
+        <div class="names">
+          <p class="en">Behavior-Driven Development</p>
+          <p class="ko">행위 주도 개발</p>
+        </div>
+      </div>
+      <div class="desc">
+        <p>"사용자가 버튼을 클릭하면 ~게 동작해야 한다"처럼 사용자의 행위와 시나리오(Given-When-Then)를 중심으로 명세를 작성하고 개발하는 방식</p>
+      </div>
+    </li>
+
+    <li class="card">
+      <div class="head">
+        <span class="abbr">DDD</span>
+        <div class="names">
+          <p class="en">Domain-Driven Development</p>
+          <p class="ko">도메인 주도 개발</p>
+        </div>
+      </div>
+      <div class="desc">
+        <p>비즈니스 핵심 영역(도메인)의 용어와 모델을 정의하고, 이를 중심으로 시스템을 설계/개발하는 방식</p>
+      </div>
+    </li>
+  </ul>
+</main>
+</body>
+</html>

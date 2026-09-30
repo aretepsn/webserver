@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>AI 클로드 × GPT 콜라보</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --surface-2: #f0f2f5;
+    --text: #15181d;
+    --text-2: #5b6370;
+    --line: #e1e4e9;
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.05);
+    --c1: #c15f3c; --c1-soft: #f7e9e3;   /* Claude 주황 */
+    --c2: #1f7a4d; --c2-soft: #e3f3ea;   /* GPT 초록 */
+    --c3: #2463b8; --c3-soft: #e4eefb;   /* 파랑 */
+    --c4: #7a4fc1; --c4-soft: #efe8fa;   /* 보라 */
+    --warn: #b7791f; --warn-soft: #fbf1dc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111418;
+      --surface: #1a1e24;
+      --surface-2: #232830;
+      --text: #e9ecf1;
+      --text-2: #9aa3b0;
+      --line: #2c323b;
+      --shadow: 0 1px 2px rgba(0,0,0,.3);
+      --c1: #e0896a; --c1-soft: #3a2820;
+      --c2: #5fcf95; --c2-soft: #16301f;
+      --c3: #7aaef0; --c3-soft: #1a2a40;
+      --c4: #b996f0; --c4-soft: #2a2140;
+      --warn: #e2b04a; --warn-soft: #3a2e14;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Malgun Gothic", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  .page {
+    max-width: 1200px; margin: 0 auto;
+    padding: 48px max(32px, env(safe-area-inset-right)) max(56px, env(safe-area-inset-bottom)) max(32px, env(safe-area-inset-left));
+  }
+  h1 { font-size: 30px; line-height: 1.3; margin: 0 0 6px; letter-spacing: -.01em; }
+  .lead { margin: 0 0 32px; color: var(--text-2); font-size: 15px; }
+  .lead .tag {
+    display: inline-block; margin-right: 6px;
+    font-size: 12.5px; font-weight: 700;
+    color: var(--c2); background: var(--c2-soft);
+    padding: 2px 9px; border-radius: 999px; vertical-align: middle;
+  }
+
+  /* 섹션 카드 */
+  .sec {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--c);
+    border-radius: 16px;
+    padding: 26px 30px 28px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .sec:nth-of-type(1) { --c: var(--c1); --soft: var(--c1-soft); }
+  .sec:nth-of-type(2) { --c: var(--c3); --soft: var(--c3-soft); }
+  .sec:nth-of-type(3) { --c: var(--c2); --soft: var(--c2-soft); }
+  .sec:nth-of-type(4) { --c: var(--c4); --soft: var(--c4-soft); }
+  .sec:nth-of-type(5) { --c: var(--c1); --soft: var(--c1-soft); }
+  .sec:nth-of-type(6) { --c: var(--warn); --soft: var(--warn-soft); }
+  .sec h2 {
+    display: inline-block; margin: 0 0 18px;
+    font-size: 20px; font-weight: 700; line-height: 1;
+    color: var(--c); background: var(--soft);
+    padding: 10px 16px; border-radius: 10px;
+  }
+  .sec h3 { font-size: 16.5px; margin: 22px 0 8px; color: var(--text); }
+  .sec p { margin: 0 0 10px; }
+  .sec p:last-child { margin-bottom: 0; }
+  strong { font-weight: 700; }
+  .hl { color: var(--c); font-weight: 700; }
+  code {
+    font-family: Consolas, "SF Mono", Menlo, ui-monospace, monospace;
+    font-size: .92em;
+    background: var(--surface-2); border: 1px solid var(--line);
+    padding: 1px 6px; border-radius: 5px;
+  }
+  pre {
+    margin: 10px 0 0;
+    font-family: Consolas, "SF Mono", Menlo, ui-monospace, monospace;
+    font-size: 14px; line-height: 1.6;
+    background: var(--surface-2); border: 1px solid var(--line);
+    padding: 14px 16px; border-radius: 10px;
+    overflow-x: auto; white-space: pre;
+  }
+  pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+  /* 흐름도 */
+  .flow { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .flow li {
+    display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start;
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px 16px;
+  }
+  .flow .who {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; letter-spacing: .02em;
+  }
+  .flow .claude .who { color: var(--c1); background: var(--c1-soft); }
+  .flow .gpt .who    { color: var(--c2); background: var(--c2-soft); }
+  .flow .user .who   { color: var(--c3); background: var(--c3-soft); }
+  .flow .ctrl .who   { color: var(--c4); background: var(--c4-soft); }
+  .flow .step { margin: 0; min-width: 0; }
+  .flow .step b { display: block; font-size: 15.5px; }
+  .flow .step > span { color: var(--text-2); font-size: 14.5px; }
+
+  /* GPT 검토 결과 세 갈래 */
+  .branch {
+    list-style: none; margin: 10px 0 2px; padding: 0;
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
+  }
+  .branch li {
+    display: flex; flex-direction: column; gap: 4px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 9px 12px; min-width: 0;
+  }
+  .branch .st {
+    align-self: flex-start;
+    font-family: Consolas, "SF Mono", Menlo, ui-monospace, monospace;
+    font-size: 12.5px; font-weight: 700; line-height: 1.5;
+    padding: 1px 8px; border-radius: 999px; white-space: nowrap;
+  }
+  .branch .st.ok   { color: var(--c2); background: var(--c2-soft); }
+  .branch .st.ask  { color: var(--c3); background: var(--c3-soft); }
+  .branch .st.work { color: var(--c1); background: var(--c1-soft); }
+  .branch .to { font-size: 13.5px; color: var(--text-2); line-height: 1.5; }
+
+  /* 표 */
+  .tbl-wrap { overflow-x: auto; margin-top: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 620px; }
+  th, td { text-align: left; vertical-align: top; padding: 11px 12px; border-bottom: 1px solid var(--line); }
+  th { font-size: 13.5px; color: var(--text-2); font-weight: 700; background: var(--surface-2); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.k { font-weight: 700; white-space: nowrap; }
+  .pill {
+    display: inline-block; font-size: 12.5px; font-weight: 700;
+    padding: 2px 9px; border-radius: 999px; white-space: nowrap;
+    color: var(--c); background: var(--soft);
+  }
+  .pill.star { color: var(--warn); background: var(--warn-soft); }
+
+  /* 프로젝트 카드 */
+  .repos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+  .repo {
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .repo.pick { border-color: var(--c); box-shadow: inset 0 0 0 1px var(--c); }
+  .repo .top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .repo .top .pill { margin-left: auto; }
+  .repo .name {
+    font-family: Consolas, "SF Mono", Menlo, ui-monospace, monospace;
+    font-size: 15px; font-weight: 700; color: var(--c); text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  @media (hover: hover) { .repo .name:hover { text-decoration: underline; } }
+  .repo .desc { margin: 0; font-size: 14.5px; }
+  .repo .meta { margin: 0; font-size: 13.5px; color: var(--text-2); }
+
+  /* 목록 */
+  .items { list-style: none; margin: 8px 0 0 18px; padding: 0; }
+  .items li { position: relative; padding: 6px 0 6px 26px; }
+  .items li::before {
+    content: ""; position: absolute; left: 0; top: 0;
+    width: 16px; height: 20px;
+    border-left: 2px solid var(--line); border-bottom: 2px solid var(--line);
+    border-bottom-left-radius: 6px;
+  }
+  .items li:not(:last-child)::after {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+    border-left: 2px solid var(--line);
+  }
+  .items p { margin: 0; }
+  .items .note { margin-top: 4px; padding-left: 12px; font-size: 15px; color: var(--text-2); border-left: 2px solid var(--line); }
+
+  /* 2단 */
+  .cols { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+  .box { background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .box h3 { margin-top: 0; }
+  .box.ok h3 { color: var(--c2); }
+  .box.no h3 { color: var(--c1); }
+
+  .link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: Consolas, "SF Mono", Menlo, ui-monospace, monospace;
+    font-size: 14px; font-weight: 600;
+    color: var(--c); text-decoration: none;
+    background: var(--surface-2); border: 1px solid var(--line);
+    padding: 6px 12px; border-radius: 8px;
+    max-width: 100%; overflow-wrap: anywhere;
+  }
+  @media (hover: hover) { .link:hover { border-color: var(--c); } }
+  .link svg { flex: 0 0 14px; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+  footer { margin-top: 28px; font-size: 13px; color: var(--text-2); }
+
+  /* 태블릿 */
+  @media (max-width: 1024px) {
+    .page { padding-top: 36px; padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
+    .sec { padding: 22px 22px 24px; }
+  }
+  /* 모바일 */
+  @media (max-width: 860px) {
+    .page { padding: 28px max(16px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+    h1 { font-size: 24px; }
+    .lead { font-size: 14px; margin-bottom: 20px; }
+    .sec { padding: 20px 18px 22px; margin-bottom: 14px; }
+    .sec h2 { font-size: 18px; padding: 9px 14px; }
+    .repos, .cols { grid-template-columns: minmax(0, 1fr); }
+    .items { margin-left: 12px; }
+    .items li { padding-left: 22px; }
+    .flow li { grid-template-columns: 38px 1fr; gap: 10px; padding: 10px 12px; }
+    .flow .who { width: 38px; height: 38px; font-size: 11px; }
+    .branch { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    .branch li { flex-direction: row; align-items: center; gap: 10px; padding: 8px 10px; }
+    table { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>AI 클로드 × GPT 콜라보</h1>
+  <p class="lead"><span class="tag">API 과금 없음</span>Claude가 만들고, GPT가 검토하고, Claude가 고치는 반복 루프를 <strong>구독 계정만으로</strong> 돌리는 방법과 GitHub에 공개된 도구 모음</p>
+
+  <!-- 1. 개념 -->
+  <section class="sec">
+    <h2>1. 하려는 것 — 생성자·검토자 루프</h2>
+    <p>두 AI를 그냥 붙여놓는 게 아니라, <span class="hl">흐름을 돌리는 "심판" 역할(오케스트레이터)</span>이 한쪽의 출력을 다른 쪽의 입력으로 넘겨주는 구조입니다. 사용자는 처음 명령 한 번만 내리고, 사용자 결정이 필요한 항목만 마지막에 질문으로 받습니다.</p>
+    <ul class="flow">
+      <li class="user"><span class="who">사용자</span><p class="step"><b>명령 1회 입력</b><span>완료 기준(acceptance criteria)을 함께 주면 루프가 잘 수렴함</span></p></li>
+      <li class="claude"><span class="who">Claude</span><p class="step"><b>① 결과물 v1 작성</b><span>코드·문서·기획서 등 파일로 저장</span></p></li>
+      <li class="gpt"><span class="who">GPT</span><div class="step"><b>② 결과물 검토 → 미비사항을 JSON으로 출력</b><span>검토 결과(status)에 따라 세 갈래로 나뉨</span>
+        <ul class="branch">
+          <li><span class="st ok">approved</span><span class="to">종료 · 사용자에게 결과 전달</span></li>
+          <li><span class="st ask">needs_user_decision</span><span class="to">루프 중단 · 질문 목록을 사용자에게</span></li>
+          <li><span class="st work">needs_work</span><span class="to">③으로 → Claude가 수정</span></li>
+        </ul></div></li>
+      <li class="claude"><span class="who">Claude</span><p class="step"><b>③ 미비사항 읽고 처리 → 결과물 v2</b></p></li>
+      <li class="ctrl"><span class="who">제어</span><p class="step"><b>④ 다시 ② … 최대 N회 반복</b><span>보통 2~3회에서 수렴. 미비사항이 줄지 않으면 중단</span></p></li>
+    </ul>
+
+    <h3>검토 결과 형식 예시</h3>
+    <p>GPT의 리뷰를 자유 텍스트로 받으면 스크립트가 판단을 못 하므로 구조화된 형식을 강제합니다.</p>
+<pre><code>{
+  "status": "needs_work" | "approved" | "needs_user_decision",
+  "issues": [
+    {"severity": "high",   "description": "...", "auto_fixable": true},
+    {"severity": "medium", "description": "...", "auto_fixable": false,
+     "question_for_user": "..."}
+  ]
+}</code></pre>
+  </section>
+
+  <!-- 2. API 대신 CLI -->
+  <section class="sec">
+    <h2>2. API 대신 CLI — 구독으로 처리하는 원리</h2>
+    <p>웹 채팅(claude.ai, chatgpt.com)을 자동화하는 건 안 되지만, 각 회사의 <span class="hl">공식 CLI 도구는 구독 계정으로 로그인</span>해서 쓸 수 있고, 스크립트에서 호출이 가능합니다.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th></th><th>Claude 쪽</th><th>GPT 쪽</th></tr></thead>
+        <tbody>
+          <tr><td class="k">도구</td><td><strong>Claude Code</strong></td><td><strong>Codex CLI</strong> — <code>npm i -g @openai/codex</code></td></tr>
+          <tr><td class="k">로그인</td><td>Claude Pro / Max 구독 계정</td><td>ChatGPT Plus / Pro 구독 계정 (<code>codex login</code>)</td></tr>
+          <tr><td class="k">과금</td><td>구독료에 포함, 별도 과금 없음</td><td>구독료에 포함, 별도 과금 없음</td></tr>
+          <tr><td class="k">비대화형 실행</td><td><code>claude -p "명령"</code></td><td><code>codex exec "명령"</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:14px">둘 다 <strong>"프롬프트 넣으면 결과 출력하고 종료"</strong>하는 모드가 있어서, 번갈아 호출하는 루프를 만들 수 있습니다. 가장 간단한 구성은 별도 스크립트 없이 <span class="hl">Claude Code 세션 하나 안에서</span> Bash로 <code>codex exec</code>를 "외부 리뷰어 도구"처럼 호출하게 하는 것입니다. 이걸 스킬(<code>.claude/skills/review-loop/</code>)로 만들어두면 <code>/review-loop 결과물.md</code> 한 줄로 실행됩니다.</p>
+  </section>
+
+  <!-- 3. GitHub 프로젝트 -->
+  <section class="sec">
+    <h2>3. GitHub에 공개된 프로젝트</h2>
+    <p>정확히 이 루프를 구독 로그인만으로 돌리는 프로젝트들입니다. 대부분 Claude Code <strong>플러그인/스킬</strong> 형태라 설치가 간단합니다.</p>
+    <ul class="repos">
+      <li class="repo pick">
+        <div class="top"><a class="name" href="https://github.com/hamelsmu/claude-review-loop" target="_blank" rel="noopener">hamelsmu/claude-review-loop</a><span class="pill star">★ 723</span></div>
+        <p class="desc">Claude가 작업을 끝내려 할 때 <strong>Stop 훅</strong>이 가로채서 Codex 리뷰를 강제 실행. 최대 4개의 Codex 리뷰어(diff 리뷰·전체 리뷰·UX 등)를 병렬로 돌리고 결과를 합쳐 Claude에게 넘김.</p>
+        <p class="meta">Claude Code 플러그인 · 코드 개발 결과물 검토에 추천</p>
+      </li>
+      <li class="repo pick">
+        <div class="top"><a class="name" href="https://github.com/promptadvisers/claudex" target="_blank" rel="noopener">promptadvisers/claudex</a><span class="pill">기획·설계</span></div>
+        <p class="desc"><strong>기획/설계 단계</strong>용. Claude가 PLAN.md 작성 → Codex가 매 라운드 다른 관점(시니어 엔지니어/보안/운영)으로 검토 → Claude 수정. 기본 3라운드, <code>--rounds N</code>으로 조절. ChatGPT Plus/Pro 계정 인증 명시.</p>
+        <p class="meta">Claude Code 플러그인 · 기획서/설계문서 검토에 추천</p>
+      </li>
+      <li class="repo">
+        <div class="top"><a class="name" href="https://github.com/wwind123/coding-review-agent-loop" target="_blank" rel="noopener">wwind123/coding-review-agent-loop</a><span class="pill">독립 실행</span></div>
+        <p class="desc">Python 오케스트레이터. 코더(Claude) → 리뷰어(Codex, Gemini 등 복수 가능) → 피드백 → 반복. 만장일치 승인 / 라운드 한도 / 치명적 이슈에서 종료. <strong>"API 키 대신 이미 로그인된 CLI 구독 사용"</strong>을 컨셉으로 내세움.</p>
+        <p class="meta">Python CLI · GitHub PR 기반</p>
+      </li>
+      <li class="repo">
+        <div class="top"><a class="name" href="https://github.com/Mauritiusllewelynpowys919/codex-review" target="_blank" rel="noopener">Mauritiusllewelynpowys919/codex-review</a><span class="pill">멀티 라운드</span></div>
+        <p class="desc"><code>codex exec --full-auto</code>로 검토. 재검토 시 Codex가 <strong>자기 이전 지적사항을 보고</strong> 실제로 고쳐졌는지 확인하는 멀티 라운드 추적.</p>
+        <p class="meta">Claude Code 플러그인</p>
+      </li>
+      <li class="repo">
+        <div class="top"><a class="name" href="https://github.com/adamjgmiller/adamsreview" target="_blank" rel="noopener">adamjgmiller/adamsreview</a><span class="pill">선택형</span></div>
+        <p class="desc">리뷰어를 Claude/Codex 중 선택 가능, 자동 수정 루프, 대화형 워크스루, 외부 지적사항 주입.</p>
+        <p class="meta">Claude Code 플러그인</p>
+      </li>
+      <li class="repo">
+        <div class="top"><a class="name" href="https://github.com/flowmar47/clodex-loop" target="_blank" rel="noopener">flowmar47/clodex-loop</a><span class="pill">역방향</span></div>
+        <p class="desc"><strong>Codex가 개발</strong>하고 <strong>Claude가 적대적으로 검토</strong>하는 반대 구성.</p>
+        <p class="meta">스크립트</p>
+      </li>
+    </ul>
+    <div class="links">
+      <a class="link" href="https://smartscope.blog/en/blog/claude-code-codex-review-loop-automation-2026/" target="_blank" rel="noopener">
+        개념 정리 글: Claude Code × Codex Review Loop — SKILL.md / Plugin / Pipeline 3단계
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- 4. 공통 동작 원리 -->
+  <section class="sec">
+    <h2>4. 공통 동작 원리</h2>
+    <ul class="items">
+      <li><p>Claude Code가 결과물 작성</p></li>
+      <li><p>Bash로 <code>codex exec "..."</code> 호출 — ChatGPT 구독 계정으로 <code>codex login</code>이 되어 있음</p></li>
+      <li><p>Codex 출력(마크다운/JSON)을 Claude가 읽고 수정</p></li>
+      <li><p>훅(Stop hook) 또는 스크립트가 라운드 수·승인 여부를 보고 반복/종료</p></li>
+    </ul>
+    <p style="margin-top:14px">Codex 쪽은 ChatGPT 계정 로그인, Claude 쪽은 Claude Code 자체 구독이라 <span class="hl">API 과금 없이</span> 동작합니다. 역방향(Codex가 주도하고 Claude가 리뷰)도 <code>claude -p</code>를 호출하면 똑같이 가능합니다.</p>
+  </section>
+
+  <!-- 5. 추천 & 설치 -->
+  <section class="sec">
+    <h2>5. 추천 및 설치</h2>
+    <div class="cols">
+      <div class="box">
+        <h3>코드 개발 결과물 검토</h3>
+        <p><strong>hamelsmu/claude-review-loop</strong> — 가장 많이 쓰이고 설치가 두 줄</p>
+<pre><code>claude plugin marketplace add hamelsmu/claude-review-loop
+claude plugin install review-loop@hamel-review</code></pre>
+      </div>
+      <div class="box">
+        <h3>기획서 / 설계문서 검토</h3>
+        <p><strong>promptadvisers/claudex</strong> — 라운드마다 다른 관점으로 압박 검토</p>
+        <p class="meta" style="color:var(--text-2);font-size:14.5px">저장소 클론 → <code>install.sh</code> → <code>codex login</code> → <code>.claude/plugins/</code>에 복사 → <code>/claudex:doctor</code>로 확인</p>
+      </div>
+    </div>
+    <h3>사전 준비 (공통)</h3>
+<pre><code>codex --version              # 설치 여부 확인
+npm i -g @openai/codex       # 없으면 설치
+codex login                  # ChatGPT 구독 계정으로 로그인</code></pre>
+    <p style="margin-top:12px">프로젝트 파일 안에 두고 <strong>직접 커스터마이징</strong>하고 싶으면 위 프로젝트 중 하나의 SKILL.md를 참고해서 자체 스킬을 작성하면 됩니다.</p>
+  </section>
+
+  <!-- 6. 주의 -->
+  <section class="sec">
+    <h2>6. 주의할 점</h2>
+    <div class="cols">
+      <div class="box">
+        <h3>구독에도 사용량 한도는 있다</h3>
+        <ul class="items">
+          <li><p>Claude Pro/Max, ChatGPT Plus 모두 <strong>5시간 단위 사용량 창</strong>(rate limit)이 있음</p></li>
+          <li><p>루프는 매 반복마다 결과물 전체를 다시 읽으므로 사용량을 빨리 소모. 기본 등급으로 큰 결과물 5회 반복이면 한도에 걸릴 수 있음</p></li>
+          <li><p>"무료로 무제한"이 아니라 <strong>"이미 낸 구독료 안에서"</strong></p></li>
+        </ul>
+      </div>
+      <div class="box no">
+        <h3>하면 안 되는 것</h3>
+        <ul class="items">
+          <li><p>브라우저 자동화(Selenium/Playwright)로 claude.ai / chatgpt.com 채팅창 조작 → <strong>양쪽 모두 이용약관 위반</strong>, 계정 정지 사유. 잘 깨지기도 함</p></li>
+          <li><p>구독 로그인 토큰을 추출해서 API처럼 직접 호출 → 마찬가지로 약관 위반</p></li>
+          <li><p><strong>공식 CLI를 공식 로그인으로 쓰는 것만</strong> 안전</p></li>
+        </ul>
+      </div>
+    </div>
+    <h3>설계 시 꼭 정할 것</h3>
+    <ul class="items">
+      <li><p><strong>종료 조건</strong> — 최대 반복 횟수, "미비사항 없음" 판정, 연속 2회 미비사항이 줄지 않으면 중단</p></li>
+      <li><p><strong>검토 기준 명시</strong> — 리뷰어는 지적할 게 없어도 지적하는 경향이 있으므로, 완료 기준을 주고 그 기준 대비로만 검토하게 해야 수렴</p></li>
+      <li><p><strong>사용자 결정 분리</strong> — "이 방향이 맞는가" 같은 주관적 판단은 두 AI가 핑퐁하기 쉬우므로 <code>needs_user_decision</code>으로 빼서 사용자에게</p></li>
+      <li><p><strong>결과물 종류</strong> — 두 CLI 모두 코딩 에이전트라 파일 기반 작업(코드·문서·마크다운)에 최적. 파일로 저장할 수 있는 결과물이면 무엇이든 가능</p></li>
+    </ul>
+  </section>
+
+  <footer>작성 2026-09-20 · 검색 결과에 섞여 있던 "Copilot 구독 필요"는 GitHub Copilot의 별개 기능 얘기로 이 주제와 무관함.</footer>
+</main>
+</body>
+</html>

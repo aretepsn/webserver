@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>AI 활용 툴</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --surface-2: #f0f2f5;
+    --text: #15181d;
+    --text-2: #5b6370;
+    --line: #e1e4e9;
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.05);
+    --c1: #2463b8; --c1-soft: #e4eefb;
+    --c2: #c15f3c; --c2-soft: #f7e9e3;
+    --c3: #1f7a4d; --c3-soft: #e3f3ea;
+    --c4: #7a4fc1; --c4-soft: #efe8fa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111418;
+      --surface: #1a1e24;
+      --surface-2: #232830;
+      --text: #e9ecf1;
+      --text-2: #9aa3b0;
+      --line: #2c323b;
+      --shadow: 0 1px 2px rgba(0,0,0,.3);
+      --c1: #7aaef0; --c1-soft: #1a2a40;
+      --c2: #e0896a; --c2-soft: #3a2820;
+      --c3: #5fcf95; --c3-soft: #16301f;
+      --c4: #b996f0; --c4-soft: #2a2140;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Malgun Gothic", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  .page {
+    max-width: 1200px; margin: 0 auto;
+    padding: 48px max(32px, env(safe-area-inset-right)) max(56px, env(safe-area-inset-bottom)) max(32px, env(safe-area-inset-left));
+  }
+  h1 { font-size: 30px; line-height: 1.3; margin: 0 0 32px; letter-spacing: -.01em; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    list-style: none; margin: 0; padding: 0;
+    align-items: start;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--c);
+    border-radius: 16px;
+    padding: 26px 30px 28px;
+    box-shadow: var(--shadow);
+  }
+  .card:nth-child(1) { --c: var(--c1); --soft: var(--c1-soft); }
+  .card:nth-child(2) { --c: var(--c2); --soft: var(--c2-soft); }
+  .card:nth-child(3) { --c: var(--c3); --soft: var(--c3-soft); }
+  .card:nth-child(4) { --c: var(--c4); --soft: var(--c4-soft); }
+
+  .name {
+    display: inline-block;
+    margin: 0;
+    font-size: 22px; font-weight: 700; line-height: 1;
+    color: var(--c); background: var(--soft);
+    padding: 10px 16px; border-radius: 10px;
+    letter-spacing: .01em;
+  }
+
+  .items { list-style: none; margin: 18px 0 0 18px; padding: 0; }
+  .items li {
+    position: relative;
+    padding: 6px 0 6px 26px;
+  }
+  .items li::before {
+    content: "";
+    position: absolute; left: 0; top: 0;
+    width: 16px; height: 20px;
+    border-left: 2px solid var(--line);
+    border-bottom: 2px solid var(--line);
+    border-bottom-left-radius: 6px;
+  }
+  .items li:not(:last-child)::after {
+    content: "";
+    position: absolute; left: 0; top: 0; bottom: 0;
+    border-left: 2px solid var(--line);
+  }
+  .items p { margin: 0; }
+  .items strong { color: var(--c); font-weight: 700; }
+  .items code {
+    font-family: Consolas, "SF Mono", Menlo, ui-monospace, monospace;
+    font-size: .92em;
+    background: var(--surface-2); border: 1px solid var(--line);
+    padding: 1px 6px; border-radius: 5px;
+  }
+  .items .note {
+    margin-top: 4px; padding-left: 12px;
+    font-size: 15px; color: var(--text-2);
+    border-left: 2px solid var(--line);
+  }
+
+  .link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: Consolas, "SF Mono", Menlo, ui-monospace, monospace;
+    font-size: 14.5px; font-weight: 600;
+    color: var(--c); text-decoration: none;
+    background: var(--surface-2); border: 1px solid var(--line);
+    padding: 6px 12px; border-radius: 8px;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  @media (hover: hover) {
+    .link:hover { border-color: var(--c); }
+  }
+  .link:focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }
+  .link svg { flex: 0 0 14px; }
+
+  /* 태블릿 */
+  @media (max-width: 1024px) {
+    .page { padding-top: 36px; padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
+    .card { padding: 22px 22px 24px; }
+  }
+  /* 모바일 */
+  @media (max-width: 860px) {
+    .page { padding: 28px max(16px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+    h1 { font-size: 24px; margin-bottom: 20px; }
+    .grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    .card { padding: 20px 18px 22px; }
+    .name { font-size: 20px; padding: 9px 14px; }
+    .items { margin: 14px 0 0 12px; }
+    .items li { padding-left: 22px; }
+    .link { min-height: 40px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>AI 활용 툴</h1>
+
+  <ul class="grid">
+    <li class="card">
+      <h2 class="name">Aside</h2>
+      <ul class="items">
+        <li><p>AI기반의 브라우저 : 일반 브라우저 기반의 AI가 아닌 반대의 개념.</p></li>
+      </ul>
+    </li>
+
+    <li class="card">
+      <h2 class="name">ORCA</h2>
+      <ul class="items">
+        <li><p>각각의 샌드박스를 만들어서 MAIN서브의 영향없이 프롬프트의 결과를 만들어 낸다.</p></li>
+        <li>
+          <a class="link" href="https://www.onorca.dev/" target="_blank" rel="noopener">
+            https://www.onorca.dev/
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="card">
+      <h2 class="name">crewAI</h2>
+      <ul class="items">
+        <li><p>오픈소스 멀티 에이전트 프레임워크</p></li>
+        <li><p>여러 AI 에이전트(직원)에게 역할을 나누어 팀 단위 작업을 처리합니다.</p></li>
+        <li><p>AI API연결 / LLM설치</p></li>
+      </ul>
+    </li>
+
+    <li class="card">
+      <h2 class="name">Hermes Agent</h2>
+      <ul class="items">
+        <li><p>오픈소스 자율형 개인 에이전트 프로그램 (Nous Research, 2026.02 공개, MIT 라이선스)</p></li>
+        <li><p>내 PC나 서버에 설치하여 도구 실행, 메모리 저장, 스킬 학습 등을 수행하는 개인용 비서입니다.</p></li>
+        <li><p><strong>이름 유래</strong> : 그리스 신화의 전령의 신 헤르메스. 메시지를 받아 대신 일을 처리하고 결과를 전달하는 "심부름꾼" 역할에서 따온 이름.</p></li>
+        <li><p><strong>정체</strong> : 웹서비스가 아닌 파이썬 CLI 프로그램. <code>pip install hermes-agent</code> 한 줄로 설치되며 별도 서버/DB 불필요.</p></li>
+        <li><p><strong>AI API 연결</strong> : Hermes 자체는 AI 모델이 아님. Claude, GPT, Gemini, DeepSeek 등 API 키를 꽂아 사용하거나 Ollama 로컬 모델 연결.</p></li>
+        <li>
+          <p><strong>동작 흐름</strong></p>
+          <p class="note">① <code>hermes chat</code> : 터미널에서 대화 (Claude Code와 유사)</p>
+          <p class="note">② <code>hermes gateway</code> : 백그라운드 상주 → Telegram / Discord / Slack 등 16개+ 메신저에서 지시 → 내 PC에서 파일·스크립트·셸 명령 실행 → 결과 메신저로 회신</p>
+          <p class="note">③ 크론 예약 작업 ("매일 아침 8시에 뉴스 요약") 자동 실행</p>
+        </li>
+        <li><p><strong>자기 개선</strong> : 작업을 끝내면 과정을 스킬 파일로 저장 → 비슷한 작업 시 재사용. 세션이 끝나도 사용자·프로젝트 맥락을 영구 메모리에 유지.</p></li>
+        <li><p><strong>Docker 사용 이유</strong> : 리눅스/맥 기준으로 만들어져 Windows에서는 Docker(또는 WSL)로 리눅스 컨테이너 안에서 실행. 셸 명령을 실행하는 에이전트이므로 컨테이너로 격리하면 보안상 안전. AWS EC2(리눅스)에 올릴 경우 Docker 없이 pip로 바로 설치 가능.</p></li>
+        <li>
+          <p><strong>비용 (API 종량제, $1 ≈ 1,400원 기준)</strong></p>
+          <p class="note">Opus 5 : 입력 $5 / 출력 $25 (100만 토큰당) · Sonnet 5 : $2 / $10 · Haiku 4.5 : $1 / $5</p>
+          <p class="note">단순 질문 1회 ≈ 13~32원이지만, 에이전트는 작업 1건에 API를 10~50회 호출 → Opus 기준 작업당 약 5,000원, Sonnet 기준 약 2,000원 (캐싱 시 1/3~1/5)</p>
+          <p class="note">$20 Pro 요금제(정액)로는 연결 불가, API 키 필수. 상주 에이전트는 Sonnet 5로 시작하고 콘솔에서 월 사용 한도 설정 권장.</p>
+        </li>
+        <li><p><strong>주의</strong> : 게이트웨이가 도는 PC가 켜져 있어야 동작 (24시간 운영 시 EC2 등 서버 필요). 메신저 봇 허용 사용자 ID를 반드시 제한할 것.</p></li>
+        <li>
+          <a class="link" href="https://hermes-agent.nousresearch.com/" target="_blank" rel="noopener">
+            https://hermes-agent.nousresearch.com/
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+          </a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</main>
+</body>
+</html>

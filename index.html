@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>자료 목록</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --surface-2: #f0f2f5;
+    --text: #15181d;
+    --text-2: #5b6370;
+    --line: #e1e4e9;
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.05);
+    --c1: #c15f3c; --c1-soft: #f7e9e3;
+    --c2: #1f7a4d; --c2-soft: #e3f3ea;
+    --c3: #2463b8; --c3-soft: #e4eefb;
+    --c4: #7a4fc1; --c4-soft: #efe8fa;
+    --c5: #a8741a; --c5-soft: #f7eedc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111418;
+      --surface: #1a1e24;
+      --surface-2: #232830;
+      --text: #e9ecf1;
+      --text-2: #9aa3b0;
+      --line: #2c323b;
+      --shadow: 0 1px 2px rgba(0,0,0,.3);
+      --c1: #e0896a; --c1-soft: #3a2820;
+      --c2: #5fcf95; --c2-soft: #16301f;
+      --c3: #7aaef0; --c3-soft: #1a2a40;
+      --c4: #b996f0; --c4-soft: #2a2140;
+      --c5: #e6b45c; --c5-soft: #3a2e17;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Malgun Gothic", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  .page {
+    max-width: 1000px; margin: 0 auto;
+    padding: 48px max(32px, env(safe-area-inset-right)) max(56px, env(safe-area-inset-bottom)) max(32px, env(safe-area-inset-left));
+  }
+  h1 { font-size: 30px; line-height: 1.3; margin: 0 0 6px; letter-spacing: -.01em; }
+  .lead { margin: 0 0 28px; color: var(--text-2); font-size: 15px; }
+
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .item {
+    display: flex; align-items: stretch;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--c);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: border-color .15s, transform .15s;
+  }
+  @media (hover: hover) {
+    .item:hover { transform: translateY(-1px); border-color: var(--c); }
+  }
+  .item:nth-child(1) { --c: var(--c1); --soft: var(--c1-soft); }
+  .item:nth-child(2) { --c: var(--c2); --soft: var(--c2-soft); }
+  .item:nth-child(3) { --c: var(--c3); --soft: var(--c3-soft); }
+  .item:nth-child(4) { --c: var(--c4); --soft: var(--c4-soft); }
+  .item.folder { --c: var(--c5); --soft: var(--c5-soft); }
+
+  .section { margin: 32px 0 12px; font-size: 15px; font-weight: 700; color: var(--text-2); letter-spacing: .02em; }
+  .section:first-of-type { margin-top: 0; }
+
+  .main {
+    flex: 1 1 auto; min-width: 0;
+    display: flex; align-items: center; gap: 20px;
+    padding: 22px 24px;
+    color: inherit; text-decoration: none;
+  }
+  .main:focus-visible { outline: 2px solid var(--c); outline-offset: -4px; border-radius: 12px; }
+  .num {
+    flex: 0 0 auto;
+    width: 44px; height: 44px; border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 17px; font-weight: 700;
+    color: var(--c); background: var(--soft);
+  }
+  .text { min-width: 0; flex: 1 1 auto; }
+  .title { display: block; margin: 0; font-size: 19px; font-weight: 700; line-height: 1.4; }
+  .desc { display: block; margin: 2px 0 0; font-size: 14.5px; color: var(--text-2); }
+  .file { display: block; margin: 6px 0 0; font-family: Consolas, "SF Mono", Menlo, ui-monospace, monospace; font-size: 13px; color: var(--text-2); }
+  .arrow { flex: 0 0 auto; color: var(--c); }
+
+  .side {
+    flex: 0 0 auto;
+    display: flex; align-items: center;
+    padding: 0 20px;
+    border-left: 1px solid var(--line);
+  }
+  .prompt {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 600;
+    color: var(--text-2); text-decoration: none;
+    background: var(--surface-2); border: 1px solid var(--line);
+    padding: 6px 11px; border-radius: 8px; white-space: nowrap;
+  }
+  @media (hover: hover) {
+    .prompt:hover { color: var(--c); border-color: var(--c); }
+  }
+  .prompt:focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }
+
+  footer { margin-top: 28px; font-size: 13px; color: var(--text-2); }
+
+  /* 태블릿 */
+  @media (max-width: 900px) {
+    .page { padding-top: 36px; padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
+    .main { padding: 20px; gap: 16px; }
+  }
+  /* 모바일 */
+  @media (max-width: 720px) {
+    .page { padding: 28px max(16px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+    h1 { font-size: 24px; }
+    .lead { font-size: 14px; margin-bottom: 20px; }
+    .list { gap: 12px; }
+    .item { flex-direction: column; }
+    .main { padding: 16px; gap: 12px; }
+    .num { width: 38px; height: 38px; font-size: 15px; border-radius: 10px; }
+    .title { font-size: 17px; }
+    .desc { font-size: 14px; }
+    .file { font-size: 12px; }
+    .arrow { width: 18px; height: 18px; }
+    .side { border-left: 0; border-top: 1px solid var(--line); padding: 10px 16px; }
+    .prompt { min-height: 40px; padding: 8px 12px; }
+  }
+  @media (max-width: 400px) {
+    .arrow { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .item { transition: none; } }
+</style>
+</head>
+<body>
+<main class="page">
+  <h1>자료 목록</h1>
+  <p class="lead">이 폴더에 있는 페이지와 하위 폴더 모음이에요. 항목을 누르면 이 화면에서 해당 페이지가 열리고, 폴더는 그 폴더의 목록(index.html)이 열립니다.</p>
+
+  <h2 class="section">페이지</h2>
+  <ul class="list">
+    <li class="item">
+      <a class="main" href="01_클로드_프로젝트_폴더구조.html">
+        <span class="num">1</span>
+        <span class="text">
+          <span class="title">한 프로젝트 폴더 안의 Claude 구조</span>
+          <span class="desc">프로젝트 폴더에 두는 Claude 관련 파일·폴더를 트리로 보고, 항목별 기능과 예시를 확인</span>
+          <span class="file">01_클로드_프로젝트_폴더구조.html</span>
+        </span>
+        <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </a>
+      <div class="side">
+        <a class="prompt" href="01_클로드_프로젝트_폴더구조_프롬프트.md" title="이 페이지를 재현하는 프롬프트">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v11.5A1.5 1.5 0 0 1 17.5 21h-10A1.5 1.5 0 0 1 6 19.5v-15A1.5 1.5 0 0 1 7.5 3z"/><path d="M14 3v5h5"/></svg>프롬프트
+        </a>
+      </div>
+    </li>
+
+    <li class="item">
+      <a class="main" href="02_개발방법론_SDD_TDD_BDD_DDD.html">
+        <span class="num">2</span>
+        <span class="text">
+          <span class="title">개발 방법론 정리</span>
+          <span class="desc">SDD · TDD · BDD · DDD 네 가지 개발 방식의 개념 비교</span>
+          <span class="file">02_개발방법론_SDD_TDD_BDD_DDD.html</span>
+        </span>
+        <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </a>
+      <div class="side">
+        <a class="prompt" href="02_개발방법론_SDD_TDD_BDD_DDD_프롬프트.md" title="이 페이지를 재현하는 프롬프트">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v11.5A1.5 1.5 0 0 1 17.5 21h-10A1.5 1.5 0 0 1 6 19.5v-15A1.5 1.5 0 0 1 7.5 3z"/><path d="M14 3v5h5"/></svg>프롬프트
+        </a>
+      </div>
+    </li>
+
+    <li class="item">
+      <a class="main" href="03_AI활용_툴.html">
+        <span class="num">3</span>
+        <span class="text">
+          <span class="title">AI 활용 툴</span>
+          <span class="desc">Aside, ORCA 등 업무에 활용할 AI 툴 소개</span>
+          <span class="file">03_AI활용_툴.html</span>
+        </span>
+        <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </a>
+      <div class="side">
+        <a class="prompt" href="03_AI활용_툴_프롬프트.md" title="이 페이지를 재현하는 프롬프트">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v11.5A1.5 1.5 0 0 1 17.5 21h-10A1.5 1.5 0 0 1 6 19.5v-15A1.5 1.5 0 0 1 7.5 3z"/><path d="M14 3v5h5"/></svg>프롬프트
+        </a>
+      </div>
+    </li>
+
+    <li class="item">
+      <a class="main" href="04_AI_클로드_GPT_콜라보.html">
+        <span class="num">4</span>
+        <span class="text">
+          <span class="title">AI 클로드 × GPT 콜라보</span>
+          <span class="desc">Claude가 만들고 GPT가 검토하는 반복 루프를 API 과금 없이 구독 계정으로 돌리는 방법과 GitHub 도구 모음</span>
+          <span class="file">04_AI_클로드_GPT_콜라보.html</span>
+        </span>
+        <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </a>
+      <div class="side">
+        <a class="prompt" href="04_AI_클로드_GPT_콜라보_프롬프트.md" title="이 페이지를 재현하는 프롬프트">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v11.5A1.5 1.5 0 0 1 17.5 21h-10A1.5 1.5 0 0 1 6 19.5v-15A1.5 1.5 0 0 1 7.5 3z"/><path d="M14 3v5h5"/></svg>프롬프트
+        </a>
+      </div>
+    </li>
+  </ul>
+
+  <h2 class="section">폴더</h2>
+  <ul class="list">
+    <li class="item folder">
+      <a class="main" href="sample_spec/index.html">
+        <span class="num"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></svg></span>
+        <span class="text">
+          <span class="title">sample_spec</span>
+          <span class="desc">spec 폴더를 정본으로 두고 src를 spec에서 만드는 방식을 다른 프로젝트에 심는 샘플</span>
+          <span class="file">sample_spec/index.html</span>
+        </span>
+        <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </a>
+    </li>
+  </ul>
+
+  <footer>페이지 4개 · 폴더 1개 · 각 페이지 옆 "프롬프트"는 해당 페이지를 다시 만들 때 쓰는 지시문(.md)이에요.</footer>
+</main>
+</body>
+</html>
